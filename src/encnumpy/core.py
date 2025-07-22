@@ -2,7 +2,7 @@ from .helpers import (
     get_ndim as _get_ndim,
     get_deepest_type as _get_deepest_type,
     convert_bools_to_ints as _convert_bools_to_ints,
-    broadcast_requirements as _broadcast_requirements,
+    broadcast_requirement as _broadcast_requirement,
 )
 
 class enc_ndarray:
