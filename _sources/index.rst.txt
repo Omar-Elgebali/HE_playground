@@ -7,8 +7,8 @@ Add your content using ``reStructuredText`` syntax. See the
 `reStructuredText <https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html>`_
 documentation for details.
 
-Welcome to neranp documentation!
-==============================================
+Welcome to enc-numpy's documentation!
+=====================================
 
 .. toctree::
    :maxdepth: 2
@@ -17,5 +17,17 @@ Welcome to neranp documentation!
 Module Documentation
 ====================
 
-.. automodule:: core
+.. automodule:: encnumpy.core
    :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. automodule:: encnumpy.utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. automodule:: encnumpy.math_ops
+   :members:
+   :undoc-members:
+   :show-inheritance:
