@@ -1,0 +1,1 @@
+from .core import enc_ndarray
