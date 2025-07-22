@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>encnumpy.helpers &#8212; enc-numpy 0.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
+    <script src="../../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for encnumpy.helpers</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">math</span><span class="w"> </span><span class="kn">import</span> <span class="n">ceil</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Shape</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">List</span>
+
+<span class="n">_ceil_step</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">idx</span><span class="p">,</span> <span class="n">step</span><span class="p">:</span> <span class="n">ceil</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span> <span class="o">/</span> <span class="n">step</span><span class="p">)</span> <span class="o">*</span> <span class="n">step</span>
+
+
+<div class="viewcode-block" id="determine_shapes">
+<a class="viewcode-back" href="../../index.html#encnumpy.helpers.determine_shapes">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">determine_shapes</span><span class="p">(</span><span class="n">shape</span><span class="p">:</span> <span class="n">Shape</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Shape</span><span class="p">,</span> <span class="n">Shape</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">shape</span><span class="p">:</span>  <span class="c1"># Empty tuple case</span>
+        <span class="n">new_shape</span> <span class="o">=</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">new_shape_actual</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># Single-element tuple case</span>
+        <span class="p">(</span><span class="n">dim</span><span class="p">,)</span> <span class="o">=</span> <span class="n">shape</span>  <span class="c1"># Unpack the single value</span>
+        <span class="n">new_shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">new_shape_actual</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">dim</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># Multi-element tuple case</span>
+        <span class="n">new_shape</span> <span class="o">=</span> <span class="n">new_shape_actual</span> <span class="o">=</span> <span class="n">shape</span>
+    <span class="k">return</span> <span class="n">new_shape</span><span class="p">,</span> <span class="n">new_shape_actual</span></div>
+
+
+
+<div class="viewcode-block" id="can_broadcast">
+<a class="viewcode-back" href="../../index.html#encnumpy.helpers.can_broadcast">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">can_broadcast</span><span class="p">(</span><span class="n">shape_a</span><span class="p">:</span> <span class="n">Shape</span><span class="p">,</span> <span class="n">shape_b</span><span class="p">:</span> <span class="n">Shape</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Checks if two shapes are compatible for broadcasting in NumPy operations.</span>
+
+<span class="sd">    :param shape_a: Tuple representing the shape of the first array.</span>
+<span class="sd">    :param shape_b: Tuple representing the shape of the second array.</span>
+<span class="sd">    :return: True if the two shapes are broadcast-compatible, False otherwise.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Pad the smaller shape with ones to match the larger shape&#39;s length</span>
+    <span class="n">len_a</span><span class="p">,</span> <span class="n">len_b</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">shape_a</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">shape_b</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">len_a</span> <span class="o">&lt;</span> <span class="n">len_b</span><span class="p">:</span>
+        <span class="n">shape_a</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,)</span> <span class="o">*</span> <span class="p">(</span><span class="n">len_b</span> <span class="o">-</span> <span class="n">len_a</span><span class="p">)</span> <span class="o">+</span> <span class="n">shape_a</span>
+    <span class="k">elif</span> <span class="n">len_b</span> <span class="o">&lt;</span> <span class="n">len_a</span><span class="p">:</span>
+        <span class="n">shape_b</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,)</span> <span class="o">*</span> <span class="p">(</span><span class="n">len_a</span> <span class="o">-</span> <span class="n">len_b</span><span class="p">)</span> <span class="o">+</span> <span class="n">shape_b</span>
+
+    <span class="c1"># Reverse shapes to align from the right (trailing dimensions matter most)</span>
+    <span class="n">rev_a</span><span class="p">,</span> <span class="n">rev_b</span> <span class="o">=</span> <span class="n">shape_a</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">shape_b</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="c1"># Iterate over the aligned dimensions</span>
+    <span class="k">for</span> <span class="n">dim_a</span><span class="p">,</span> <span class="n">dim_b</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">rev_a</span><span class="p">,</span> <span class="n">rev_b</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">dim_a</span> <span class="o">!=</span> <span class="n">dim_b</span> <span class="ow">and</span> <span class="n">dim_a</span> <span class="o">!=</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">dim_b</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="c1"># Handle special case for zero-size dimensions</span>
+    <span class="k">if</span> <span class="mi">0</span> <span class="ow">in</span> <span class="n">shape_a</span> <span class="ow">or</span> <span class="mi">0</span> <span class="ow">in</span> <span class="n">shape_b</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="n">dim</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">shape_a</span><span class="p">)</span> <span class="o">==</span> <span class="nb">all</span><span class="p">(</span><span class="n">dim</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">shape_b</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="get_ndim">
+<a class="viewcode-back" href="../../index.html#encnumpy.helpers.get_ndim">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_ndim</span><span class="p">(</span><span class="n">matrix</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Recursively determines the number of dimensions of a nested list or array-like structure.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        matrix (Any): The nested list or array-like structure.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        int: The number of dimensions.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ndim</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">matrix</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="n">ndim</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">matrix</span><span class="p">:</span>  <span class="c1"># empty list</span>
+            <span class="k">break</span>
+        <span class="n">matrix</span> <span class="o">=</span> <span class="n">matrix</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">ndim</span></div>
+
+
+<div class="viewcode-block" id="get_deepest_type">
+<a class="viewcode-back" href="../../index.html#encnumpy.helpers.get_deepest_type">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_deepest_type</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Recursively determines the type of the deepest element in a nested list or array-like structure.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        obj (Any): The nested list or array-like structure.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        Type: The type of the deepest element.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">get_deepest_type</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+        <span class="c1"># Map NumPy scalar types to Python built-in types</span>
+        <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="vm">__module__</span> <span class="o">==</span> <span class="s1">&#39;numpy&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;int&#39;</span> <span class="ow">in</span> <span class="n">t</span><span class="o">.</span><span class="vm">__name__</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">int</span>
+            <span class="k">if</span> <span class="s1">&#39;float&#39;</span> <span class="ow">in</span> <span class="n">t</span><span class="o">.</span><span class="vm">__name__</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">float</span>
+            <span class="k">if</span> <span class="s1">&#39;bool&#39;</span> <span class="ow">in</span> <span class="n">t</span><span class="o">.</span><span class="vm">__name__</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">bool</span>
+        <span class="k">return</span> <span class="n">t</span></div>
+
+
+<div class="viewcode-block" id="convert_bools_to_ints">
+<a class="viewcode-back" href="../../index.html#encnumpy.helpers.convert_bools_to_ints">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">convert_bools_to_ints</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Recursively converts boolean values in a nested list or array-like structure to integers.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        obj (Any): The nested list or array-like structure.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        Any: The modified structure with booleans converted to integers.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">convert_bools_to_ints</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">obj</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="is_rectangular_nd">
+<a class="viewcode-back" href="../../index.html#encnumpy.helpers.is_rectangular_nd">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_rectangular_nd</span><span class="p">(</span><span class="n">matrix</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Recursively checks whether a nested list is non-jagged (i.e., rectangular) in all dimensions.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        matrix (Any): The nested list to check.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool: True if all dimensions are rectangular, False otherwise.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">matrix</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">True</span>  <span class="c1"># Base case: scalar value</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">matrix</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>  <span class="c1"># Empty list is considered rectangular</span>
+
+    <span class="c1"># All elements must be of the same type (either all lists or all scalars)</span>
+    <span class="n">first_elem_is_list</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">matrix</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">list</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">matrix</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="o">!=</span> <span class="n">first_elem_is_list</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>  <span class="c1"># Mixed types at the same level</span>
+
+    <span class="k">if</span> <span class="n">first_elem_is_list</span><span class="p">:</span>
+        <span class="c1"># All sublists must be of the same length</span>
+        <span class="n">expected_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">matrix</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">sublist</span> <span class="ow">in</span> <span class="n">matrix</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sublist</span><span class="p">)</span> <span class="o">!=</span> <span class="n">expected_len</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">is_rectangular_nd</span><span class="p">(</span><span class="n">sublist</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">return</span> <span class="kc">True</span></div>
+
+
+
+<div class="viewcode-block" id="format_nd_list">
+<a class="viewcode-back" href="../../index.html#encnumpy.helpers.format_nd_list">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">format_nd_list</span><span class="p">(</span><span class="n">arr</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">level</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Formats a nested list or array-like structure into a string representation with proper indentation.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        arr (Any): The nested list or array-like structure to format.</span>
+<span class="sd">        level (int): The current indentation level (used for recursive calls).</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        str: The formatted string representation of the nested structure.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">indent</span> <span class="o">=</span> <span class="s2">&quot;  &quot;</span> <span class="o">*</span> <span class="n">level</span>
+    <span class="n">next_indent</span> <span class="o">=</span> <span class="s2">&quot;  &quot;</span> <span class="o">*</span> <span class="p">(</span><span class="n">level</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">arr</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arr</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arr</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="c1"># 3D or higher: group inner blocks with outer brackets</span>
+            <span class="n">inner_blocks</span> <span class="o">=</span> <span class="p">[</span><span class="n">format_nd_list</span><span class="p">(</span><span class="n">sub</span><span class="p">,</span> <span class="n">level</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">sub</span> <span class="ow">in</span> <span class="n">arr</span><span class="p">]</span>
+            <span class="n">joined</span> <span class="o">=</span> <span class="s2">&quot;,</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">inner_blocks</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">indent</span> <span class="o">+</span> <span class="s2">&quot;[</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">joined</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">indent</span> <span class="o">+</span> <span class="s2">&quot;]&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># 2D block: format each row with proper alignment</span>
+            <span class="n">formatted_rows</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">arr</span><span class="p">:</span>
+                <span class="n">formatted_row</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="si">:</span><span class="s2">4.1f</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;0&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span>
+                        <span class="k">if</span> <span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">is_integer</span><span class="p">()</span>
+                        <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+                    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">row</span>
+                <span class="p">)</span>
+                <span class="n">formatted_rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">next_indent</span> <span class="o">+</span> <span class="s2">&quot;[&quot;</span> <span class="o">+</span> <span class="n">formatted_row</span> <span class="o">+</span> <span class="s2">&quot;]&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">indent</span> <span class="o">+</span> <span class="s2">&quot;[</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">formatted_rows</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">indent</span> <span class="o">+</span> <span class="s2">&quot;]&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># 1D list</span>
+        <span class="n">formatted_line</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="si">:</span><span class="s2">4.1f</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;0&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span>
+                <span class="k">if</span> <span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">is_integer</span><span class="p">()</span>
+                <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">arr</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">indent</span> <span class="o">+</span> <span class="s2">&quot;[&quot;</span> <span class="o">+</span> <span class="n">formatted_line</span> <span class="o">+</span> <span class="s2">&quot;]&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="cut_shape">
+<a class="viewcode-back" href="../../index.html#encnumpy.helpers.cut_shape">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">cut_shape</span><span class="p">(</span><span class="n">shape</span><span class="p">:</span> <span class="n">Shape</span><span class="p">,</span> <span class="n">axis</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">keepdims</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Shape</span><span class="p">,</span> <span class="n">Shape</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Cuts the shape of a matrix along a specified axis.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        shape (Shape): The original shape of the matrix.</span>
+<span class="sd">        axis (int): The axis along which to cut the shape.</span>
+<span class="sd">        keepdims (bool): Whether to keep the dimensions of the original shape.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        Tuple[Shape, Shape]: The new shape after cutting.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">keepdims</span><span class="p">:</span>
+        <span class="n">new_shape</span> <span class="o">=</span> <span class="n">shape</span><span class="p">[:</span><span class="n">axis</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span><span class="p">,)</span> <span class="o">+</span> <span class="n">shape</span><span class="p">[</span><span class="n">axis</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">new_shape</span> <span class="o">=</span> <span class="n">shape</span><span class="p">[:</span><span class="n">axis</span><span class="p">]</span> <span class="o">+</span> <span class="n">shape</span><span class="p">[</span><span class="n">axis</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:]</span>
+
+    <span class="c1"># If the new shape is empty, return the original shape</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">new_shape</span><span class="p">:</span>
+        <span class="n">new_shape_visual</span> <span class="o">=</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">new_shape_actual</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">new_shape_visual</span> <span class="o">=</span> <span class="p">(</span><span class="n">new_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">new_shape_actual</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">new_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">new_shape_visual</span> <span class="o">=</span> <span class="n">new_shape</span>
+        <span class="n">new_shape_actual</span> <span class="o">=</span> <span class="n">new_shape</span>
+    <span class="k">return</span> <span class="n">new_shape_visual</span><span class="p">,</span> <span class="n">new_shape_actual</span></div>
+
+
+
+<div class="viewcode-block" id="broadcast_requirement">
+<a class="viewcode-back" href="../../index.html#encnumpy.helpers.broadcast_requirement">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">broadcast_requirement</span><span class="p">(</span>
+    <span class="n">x1</span><span class="p">:</span> <span class="n">Shape</span><span class="p">,</span> <span class="n">x2</span><span class="p">:</span> <span class="n">Shape</span><span class="p">,</span> <span class="n">is_matmul</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">bool</span><span class="p">],</span> <span class="n">Shape</span><span class="p">,</span> <span class="n">Shape</span><span class="p">,</span> <span class="n">Shape</span><span class="p">,</span> <span class="n">Shape</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Determines the broadcast requirement and resulting shape for two input shapes.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        x1 (Shape): The first input shape.</span>
+<span class="sd">        x2 (Shape): The second input shape.</span>
+<span class="sd">        is_matmul (bool): Whether this is for matrix multiplication; if so, cuts off the last two dimensions and appends matrix multiplication dimensions.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        Tuple:</span>
+<span class="sd">            - (bool, bool): Whether the left and right shapes need broadcasting.</span>
+<span class="sd">            - new_shape_1 (Shape): The new shape for the first input after broadcasting.</span>
+<span class="sd">            - new_shape_2 (Shape): The new shape for the second input after broadcasting.</span>
+<span class="sd">            - padded_batch_shape_1 (Shape): The padded batch shape for the first input.</span>
+<span class="sd">            - padded_batch_shape_2 (Shape): The padded batch shape for the second input.</span>
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If the shapes are incompatible for broadcasting.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">is_matmul</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x1</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">x2</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;For matmul, both shapes must have at least 2 dimensions.&quot;</span><span class="p">)</span>
+
+        <span class="n">batch_x1</span><span class="p">,</span> <span class="n">mat_x1</span> <span class="o">=</span> <span class="n">x1</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="n">x1</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span>
+        <span class="n">batch_x2</span><span class="p">,</span> <span class="n">mat_x2</span> <span class="o">=</span> <span class="n">x2</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="n">x2</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">batch_x1</span><span class="p">,</span> <span class="n">mat_x1</span> <span class="o">=</span> <span class="n">x1</span><span class="p">,</span> <span class="p">()</span>
+        <span class="n">batch_x2</span><span class="p">,</span> <span class="n">mat_x2</span> <span class="o">=</span> <span class="n">x2</span><span class="p">,</span> <span class="p">()</span>
+
+    <span class="n">original_len_x1</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">batch_x1</span><span class="p">)</span>
+    <span class="n">original_len_x2</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">batch_x2</span><span class="p">)</span>
+
+    <span class="n">max_len</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">original_len_x1</span><span class="p">,</span> <span class="n">original_len_x2</span><span class="p">)</span>
+    <span class="n">padded_x1</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,)</span> <span class="o">*</span> <span class="p">(</span><span class="n">max_len</span> <span class="o">-</span> <span class="n">original_len_x1</span><span class="p">)</span> <span class="o">+</span> <span class="n">batch_x1</span>
+    <span class="n">padded_x2</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,)</span> <span class="o">*</span> <span class="p">(</span><span class="n">max_len</span> <span class="o">-</span> <span class="n">original_len_x2</span><span class="p">)</span> <span class="o">+</span> <span class="n">batch_x2</span>
+
+    <span class="n">result_shape</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">need_left</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">padded_x1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">original_len_x1</span>
+    <span class="n">need_right</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">padded_x2</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">original_len_x2</span>
+
+    <span class="k">for</span> <span class="n">dim1</span><span class="p">,</span> <span class="n">dim2</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">padded_x1</span><span class="p">,</span> <span class="n">padded_x2</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">dim1</span> <span class="o">==</span> <span class="n">dim2</span><span class="p">:</span>
+            <span class="n">result_shape</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dim1</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dim1</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">result_shape</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dim2</span><span class="p">)</span>
+            <span class="n">need_left</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">elif</span> <span class="n">dim2</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">result_shape</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dim1</span><span class="p">)</span>
+            <span class="n">need_right</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Incompatible dimensions: </span><span class="si">{</span><span class="n">dim1</span><span class="si">}</span><span class="s2"> vs </span><span class="si">{</span><span class="n">dim2</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Construct new shapes</span>
+    <span class="n">new_shape_1</span> <span class="o">=</span> <span class="n">result_shape</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">mat_x1</span><span class="p">)</span>
+    <span class="n">new_shape_2</span> <span class="o">=</span> <span class="n">result_shape</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">mat_x2</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="p">(</span><span class="n">need_left</span><span class="p">,</span> <span class="n">need_right</span><span class="p">),</span>
+        <span class="nb">tuple</span><span class="p">(</span><span class="n">new_shape_1</span><span class="p">),</span>
+        <span class="nb">tuple</span><span class="p">(</span><span class="n">new_shape_2</span><span class="p">),</span>
+        <span class="p">(</span><span class="o">*</span><span class="n">padded_x1</span><span class="p">,</span> <span class="o">*</span><span class="n">mat_x1</span><span class="p">),</span>
+        <span class="p">(</span><span class="o">*</span><span class="n">padded_x2</span><span class="p">,</span> <span class="o">*</span><span class="n">mat_x2</span><span class="p">),</span>
+    <span class="p">)</span></div>
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">enc-numpy</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, Omar Elgebali, Mohamed Osama.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

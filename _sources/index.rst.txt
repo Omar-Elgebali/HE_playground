@@ -22,12 +22,12 @@ Module Documentation
    :undoc-members:
    :show-inheritance:
 
-.. automodule:: encnumpy.utils
+.. automodule:: encnumpy.helpers
    :members:
    :undoc-members:
    :show-inheritance:
 
-.. automodule:: encnumpy.math_ops
+.. automodule:: encnumpy.types
    :members:
    :undoc-members:
    :show-inheritance:
