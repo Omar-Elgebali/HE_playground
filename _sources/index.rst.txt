@@ -14,33 +14,20 @@ Welcome to enc-numpy's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   core
-   helpers
-   types
-
-Core Module
-===========
+Module Documentation
+====================
 
 .. automodule:: encnumpy.core
    :members:
    :undoc-members:
    :show-inheritance:
-   :autosummary:
-
-Helpers Module
-==============
 
 .. automodule:: encnumpy.helpers
    :members:
    :undoc-members:
    :show-inheritance:
-   :autosummary:
-
-Types Module
-============
 
 .. automodule:: encnumpy.types
    :members:
    :undoc-members:
    :show-inheritance:
-   :autosummary:
