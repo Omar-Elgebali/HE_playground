@@ -1,4 +1,4 @@
-from .array_helpers import (
+from .helpers import (
     get_ndim as _get_ndim,
     get_deepest_type as _get_deepest_type,
     convert_bools_to_ints as _convert_bools_to_ints,
