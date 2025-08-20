@@ -43,13 +43,7 @@
               <!-- Local TOC -->
               <div class="local-toc"><ul>
 <li><a class="reference internal" href="#">Welcome to enc-numpy’s documentation!</a></li>
-<li><a class="reference internal" href="#module-encnumpy.core">Module Documentation</a><ul>
-<li><a class="reference internal" href="#encnumpy.core.enc_ndarray"><code class="docutils literal notranslate"><span class="pre">enc_ndarray</span></code></a><ul>
-<li><a class="reference internal" href="#encnumpy.core.enc_ndarray.data"><code class="docutils literal notranslate"><span class="pre">enc_ndarray.data</span></code></a></li>
-<li><a class="reference internal" href="#encnumpy.core.enc_ndarray.shape"><code class="docutils literal notranslate"><span class="pre">enc_ndarray.shape</span></code></a></li>
-<li><a class="reference internal" href="#encnumpy.core.enc_ndarray.dtype"><code class="docutils literal notranslate"><span class="pre">enc_ndarray.dtype</span></code></a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#module-encnumpy.helpers">Module Documentation</a><ul>
 <li><a class="reference internal" href="#encnumpy.helpers.broadcast_requirement"><code class="docutils literal notranslate"><span class="pre">broadcast_requirement()</span></code></a></li>
 <li><a class="reference internal" href="#encnumpy.helpers.can_broadcast"><code class="docutils literal notranslate"><span class="pre">can_broadcast()</span></code></a></li>
 <li><a class="reference internal" href="#encnumpy.helpers.convert_bools_to_ints"><code class="docutils literal notranslate"><span class="pre">convert_bools_to_ints()</span></code></a></li>
@@ -95,49 +89,9 @@ documentation for details.</p>
 <div class="toctree-wrapper compound">
 </div>
 </section>
-<section id="module-encnumpy.core">
-<span id="module-documentation"></span><h1>Module Documentation<a class="headerlink" href="#module-encnumpy.core" title="Link to this heading"></a></h1>
-<dl class="py class">
-<dt class="sig sig-object py" id="encnumpy.core.enc_ndarray">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">encnumpy.core.</span></span><span class="sig-name descname"><span class="pre">enc_ndarray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/encnumpy/core.html#enc_ndarray"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encnumpy.core.enc_ndarray" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>A class to represent an encrypted NumPy ndarray.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="encnumpy.core.enc_ndarray.data">
-<span class="sig-name descname"><span class="pre">data</span></span><a class="headerlink" href="#encnumpy.core.enc_ndarray.data" title="Link to this definition"></a></dt>
-<dd><p>The encrypted data of the ndarray.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>bytes</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="encnumpy.core.enc_ndarray.shape">
-<span class="sig-name descname"><span class="pre">shape</span></span><a class="headerlink" href="#encnumpy.core.enc_ndarray.shape" title="Link to this definition"></a></dt>
-<dd><p>The shape of the original ndarray.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>tuple</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="encnumpy.core.enc_ndarray.dtype">
-<span class="sig-name descname"><span class="pre">dtype</span></span><a class="headerlink" href="#encnumpy.core.enc_ndarray.dtype" title="Link to this definition"></a></dt>
-<dd><p>The data type of the original ndarray.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py function" id="module-encnumpy.helpers">
+<section id="module-encnumpy.helpers">
+<span id="module-documentation"></span><h1>Module Documentation<a class="headerlink" href="#module-encnumpy.helpers" title="Link to this heading"></a></h1>
+<dl class="py function">
 <dt class="sig sig-object py" id="encnumpy.helpers.broadcast_requirement">
 <span class="sig-prename descclassname"><span class="pre">encnumpy.helpers.</span></span><span class="sig-name descname"><span class="pre">broadcast_requirement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_matmul</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/encnumpy/helpers.html#broadcast_requirement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encnumpy.helpers.broadcast_requirement" title="Link to this definition"></a></dt>
 <dd><p>Determines the broadcast requirement and resulting shape for two input shapes.</p>
