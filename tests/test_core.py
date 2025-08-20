@@ -28,7 +28,7 @@ def test_multiply():
     enc_x1 = enc_ndarray(x1, x1.shape, str(x1.dtype))
     enc_x2 = enc_ndarray(x2, x2.shape, str(x2.dtype))
     result = enc_x1 * enc_x2
-    expected = np.array([[5, 12], [21, 35]])
+    expected = np.array([[5, 12], [21, 32]])
     assert np.array_equal(result.data, expected)
 
 def test_divide():
