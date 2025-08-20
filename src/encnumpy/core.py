@@ -5,17 +5,19 @@ from .helpers import (
     broadcast_requirement as _broadcast_requirement,
 )
 
+import numpy as np
+
 class enc_ndarray:
     """
     A class to represent an encrypted NumPy ndarray.
     
     Attributes:
-        data (bytes): The encrypted data of the ndarray.
+        data (list): The encrypted data of the ndarray.
         shape (tuple): The shape of the original ndarray.
         dtype (str): The data type of the original ndarray.
     """
-    
-    def __init__(self, data: bytes, shape: tuple, dtype: str):
+
+    def __init__(self, data: np.ndarray, shape: tuple, dtype: str):
         self.data = data
         self.shape = shape
         self.dtype = dtype
@@ -55,6 +57,8 @@ class enc_ndarray:
             raise TypeError("Can only divide by another enc_ndarray.")
         if self.shape != other.shape:
             raise ValueError("Shapes must match for division.")
-        
+
+        if np.any(other.data == 0):
+            raise ZeroDivisionError("Division by zero encountered in enc_ndarray.")
         # Placeholder for actual division logic
         return enc_ndarray(self.data / other.data, self.shape, self.dtype)
