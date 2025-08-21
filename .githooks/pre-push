@@ -32,6 +32,7 @@ fi
 echo "========================================"
 echo "🚀 Pre-push hook: Running test checks..."
 echo "========================================"
+echo
 
 # 1) Run local repo tests
 echo "[1/1] Running local tests..."
@@ -48,3 +49,4 @@ echo
 echo "========================================"
 echo "✅ Pre-push checks completed."
 echo "========================================"
+echo
