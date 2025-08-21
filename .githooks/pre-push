@@ -1,0 +1,50 @@
+#!/bin/sh
+
+protected_branches="master main"
+current_branch=$(git symbolic-ref --short HEAD 2>/dev/null)
+
+is_protected=false
+
+# Check if the current branch is protected
+for branch in $protected_branches; do
+    if [ "$branch" = "$current_branch" ]; then
+        is_protected=true
+        break
+    fi
+done
+
+if [ "$is_protected" = true ]; then
+    # Yellow for the prompt
+    printf "\033[33mYou're about to push to %s, is that what you intended? [y|n] \033[0m" "$current_branch"
+    printf "\033[1m"
+    read reply < /dev/tty
+    printf "\033[0m\n"
+
+    case "$reply" in
+        [Yy]) 
+            # Do nothing here, just continue with rest of script
+            ;;
+        *)    
+            exit 1 ;; # block push immediately
+    esac
+fi
+
+echo "========================================"
+echo "🚀 Pre-push hook: Running test checks..."
+echo "========================================"
+
+# 1) Run local repo tests
+echo "[1/1] Running local tests..."
+pytest -q --disable-warnings --override-ini addopts=""
+RESULT=$?
+
+if [ $RESULT -ne 0 ]; then
+    echo "❌ local tests FAILED. Aborting push!"
+    echo
+    exit 1
+fi
+
+echo
+echo "========================================"
+echo "✅ Pre-push checks completed."
+echo "========================================"
